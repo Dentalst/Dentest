@@ -352,11 +352,7 @@
   .likert-option.selected .option-check { display: flex; }
 
   .nav-btns {
-    display: flex;
-    gap: 12px;
-    padding: 24px;
-    max-width: 500px;
-    margin: 0 auto;
+    display: none;
   }
 
   .nav-btn {
@@ -932,7 +928,14 @@ function renderQuestion() {
 function selectOption(idx) {
   answers[current] = idx;
   renderQuestion();
-  document.getElementById('nextBtn').disabled = false;
+  setTimeout(function() {
+    if (current < questions.length - 1) {
+      current++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }, 400);
 }
 
 function prevQ() {
@@ -953,50 +956,68 @@ function showResult() {
   document.getElementById('quiz').style.display = 'none';
   document.getElementById('result').style.display = 'block';
 
-  const totalScore = answers.reduce((sum, ansIdx, qIdx) => {
+  // 카테고리별 점수
+  var managementScore = (answers[0] !== null ? questions[0].options[answers[0]].score : 0)  // 치과 방문
+                      + (answers[1] !== null ? questions[1].options[answers[1]].score : 0)  // 단 음식
+                      + (answers[2] !== null ? questions[2].options[answers[2]].score : 0); // 불소치약
+
+  var erosionRawScore = (answers[1] !== null ? questions[1].options[answers[1]].score : 0)  // 단 음식
+                      + (answers[3] !== null ? questions[3].options[answers[3]].score : 0); // 구강건조
+
+  var bruxismRawScore = (answers[6] !== null ? questions[6].options[answers[6]].score : 0); // 이갈이
+
+  var symptomRawScore = (answers[4] !== null ? questions[4].options[answers[4]].score : 0)  // 출혈
+                      + (answers[5] !== null ? questions[5].options[answers[5]].score : 0)  // 시림
+                      + (answers[7] !== null ? questions[7].options[answers[7]].score : 0); // 통증
+
+  // 가장 높은 카테고리 찾기
+  var categories = [
+    { key: 'management', score: managementScore, max: 12 },
+    { key: 'erosion',    score: erosionRawScore, max: 8 },
+    { key: 'bruxism',   score: bruxismRawScore, max: 4 },
+    { key: 'symptom',   score: symptomRawScore, max: 12 },
+  ];
+
+  var dominant = categories.reduce(function(a, b) {
+    return (a.score / a.max) >= (b.score / b.max) ? a : b;
+  });
+
+  var typeMap = {
+    management: { name: "치과 장기 무단결석형", badge: "관리 공백", desc: "정기 방문과 위생 관리에 공백이 쌓이고 있어요. 지금부터 시작하면 충분히 회복 가능합니다." },
+    erosion:    { name: "법랑질 산 부식형",     badge: "산 부식",  desc: "단 음료와 건조한 구강 환경이 치아 표면을 서서히 녹이고 있을 수 있어요." },
+    bruxism:    { name: "수면 이갈이형",         badge: "이갈이",   desc: "자는 동안 이를 갈고 있을 가능성이 높아요. 치아 균열과 마모의 주요 원인입니다." },
+    symptom:    { name: "증상 누적형",           badge: "증상 누적", desc: "시림, 출혈, 통증 등 여러 신호가 동시에 나타나고 있어요. 지금 바로 확인이 필요합니다." },
+  };
+
+  var dominantType = typeMap[dominant.key];
+
+  var totalScore = answers.reduce(function(sum, ansIdx, qIdx) {
     return sum + (ansIdx !== null ? questions[qIdx].options[ansIdx].score : 0);
   }, 0);
 
-  const maxScore = questions.length * 4;
-  const ratio = totalScore / maxScore;
+  var maxScore = questions.length * 4;
+  var ratio = totalScore / maxScore;
 
-  let dentalAge, type, typeBadge, typeClass, dentalClass;
-  let analyses = [];
+  var dentalAge, typeClass, dentalClass, typeBadge;
 
   if (ratio < 0.2) {
     dentalAge = Math.max(10, realAge - Math.floor(Math.random() * 4 + 2));
-    type = "건강 관리형";
-    typeBadge = "✓ 양호";
-    typeClass = "ok";
-    dentalClass = "dental-ok";
-    analyses = [
-      { icon: "✅", title: "정기 관리 습관", desc: "꾸준한 치과 방문과 올바른 구강 위생 습관을 유지하고 있습니다." },
-      { icon: "🦷", title: "법랑질 상태", desc: "산성 음료 섭취가 적어 치아 표면 손상 위험이 낮습니다." },
-      { icon: "🌿", title: "잇몸 건강", desc: "출혈이나 염증 신호가 없어 잇몸 상태가 양호합니다." }
-    ];
+    typeClass = "ok"; dentalClass = "dental-ok"; typeBadge = "✓ 양호";
   } else if (ratio < 0.45) {
     dentalAge = realAge + Math.floor(ratio * 20 + 5);
-    type = "주의 필요형";
-    typeBadge = "⚠ 주의";
-    typeClass = "caution";
-    dentalClass = "dental-caution";
-    analyses = [
-      { icon: "⚠️", title: "관리 공백 발생", desc: "일부 구강 위생 습관에 공백이 있어 치태 축적 가능성이 있습니다." },
-      { icon: "☕", title: "산 부식 주의", desc: "산성 음료 섭취 빈도가 법랑질에 영향을 줄 수 있습니다." },
-      { icon: "🔍", title: "정기 검진 필요", desc: "현재 상태에서 조기 발견 시 간단한 처치로 해결 가능합니다." }
-    ];
+    typeClass = "caution"; dentalClass = "dental-caution"; typeBadge = "⚠ 주의";
   } else {
     dentalAge = realAge + Math.floor(ratio * 30 + 15);
-    type = "즉시 점검 필요형";
-    typeBadge = "⚡ 즉시 점검";
-    typeClass = "warn";
-    dentalClass = "dental-warn";
-    analyses = [
-      { icon: "🚨", title: "복합적 위험 신호", desc: "시림, 출혈, 통증 등 복수의 증상이 확인됩니다. 전문 진단이 필요합니다." },
-      { icon: "🦠", title: "충치·잇몸 위험", desc: "관리 공백과 식습관이 복합적으로 작용하고 있을 가능성이 높습니다." },
-      { icon: "⏰", title: "조기 치료가 핵심", desc: "지금 치료하면 비용과 시간이 훨씬 적게 듭니다. 방치할수록 악화됩니다." }
-    ];
+    typeClass = "warn"; dentalClass = "dental-warn"; typeBadge = "⚡ 즉시 점검";
   }
+
+  var analyses = [
+    { icon: "🔬", title: "주요 유형: " + dominantType.name, desc: dominantType.desc },
+    { icon: "📊", title: "종합 위험도", desc: ratio < 0.2 ? "전반적으로 구강 건강이 양호하게 유지되고 있습니다." : ratio < 0.45 ? "일부 항목에서 위험 신호가 감지됩니다. 조기 관리가 중요합니다." : "복합적인 위험 신호가 확인됩니다. 전문 진단이 필요합니다." },
+    { icon: "💡", title: "지금 할 수 있는 것", desc: dominant.key === 'erosion' ? "산성 음료 후 물로 입 헹구기, 불소 치약으로 교체하기" : dominant.key === 'bruxism' ? "자기 전 턱 긴장 풀기, 수면 이갈이 마우스가드 상담" : dominant.key === 'symptom' ? "통증 부위 기록 후 치과 방문, 방치 금지" : "6개월에 한 번 정기 검진 예약하기" },
+  ];
+
+  var type = dominantType.name;
 
   const diff = dentalAge - realAge;
   const diffText = diff > 0
@@ -1006,9 +1027,9 @@ function showResult() {
     : `<span class="age-diff same">실제 나이와 동일</span>`;
 
   // 세부 점수 계산
-  const hygieneScore = Math.round(100 - ((answers[0] !== null ? questions[0].options[answers[0]].score : 0) + (answers[1] !== null ? questions[1].options[answers[1]].score : 0) + (answers[2] !== null ? questions[2].options[answers[2]].score : 0)) / 12 * 100);
-  const erosionScore = Math.round(100 - (answers[3] !== null ? questions[3].options[answers[3]].score : 0) / 4 * 100);
-  const symptomScore = Math.round(100 - ((answers[4] !== null ? questions[4].options[answers[4]].score : 0) + (answers[5] !== null ? questions[5].options[answers[5]].score : 0) + (answers[6] !== null ? questions[6].options[answers[6]].score : 0) + (answers[7] !== null ? questions[7].options[answers[7]].score : 0)) / 16 * 100);
+  const hygieneScore = Math.round(100 - managementScore / 12 * 100);
+  const erosionScore = Math.round(100 - erosionRawScore / 8 * 100);
+  const symptomScore = Math.round(100 - symptomRawScore / 12 * 100);
 
   let ctaTitle, ctaDesc, ctaBtn;
 
