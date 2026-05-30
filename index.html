@@ -1083,8 +1083,10 @@ function showToast(msg) {
 }
 
 function copyLink() {
+  var diff = dentalAge - realAge;
+  var diffText = diff > 0 ? '실제보다 ' + diff + '살 더 늙은 치아' : diff < 0 ? '실제보다 ' + Math.abs(diff) + '살 더 젊은 치아' : '실제 나이와 딱 같은 치아';
   var shareText = '🦷 내 치아 나이 테스트 결과\n'
-    + '실제 나이 ' + realAge + '세 → 치아 나이 ' + dentalAge + '세\n'
+    + diffText + '\n'
     + '유형: ' + type + '\n\n'
     + '나도 해보기 👉 https://dentalst.github.io/Dentest/';
   if (navigator.clipboard && window.isSecureContext) {
