@@ -1065,7 +1065,7 @@ function showResult() {
     + '</div>'
     + '<div class="section-title fade-up">주요 발견 사항</div>'
     + '<div class="analysis-items fade-up">' + analysisHTML + '</div>'
-    + '<div class="cta-box fade-up"><div class="cta-box-title">' + ctaTitle + '</div><div class="cta-box-desc">' + ctaDesc + '</div><a class="cta-btn" href="https://open.kakao.com/o/sllXWTvi" target="_blank">📩 ' + ctaBtn + '</a><div class="share-btns"><button class="share-btn" onclick="copyLink()">🔗 링크 복사</button><button class="share-btn" onclick="saveImage()">📷 이미지 저장</button></div><button class="retry-btn" onclick="retryTest()">↺ 다시 테스트하기</button></div>'
+    + '<div class="cta-box fade-up"><div class="cta-box-title">' + ctaTitle + '</div><div class="cta-box-desc">' + ctaDesc + '</div><a class="cta-btn" href="https://open.kakao.com/o/sllXWTvi" target="_blank">📩 ' + ctaBtn + '</a><div class="share-btns"><button class="share-btn" onclick="copyLink()">🔗 결과 공유하기</button><button class="share-btn" onclick="saveImage()">📷 이미지 저장</button></div><button class="retry-btn" onclick="retryTest()">↺ 다시 테스트하기</button></div>'
     + '<div class="ref-note fade-up">본 검사는 자가진단 목적으로 제작되었으며 임상적 진단을 대체하지 않습니다.<br>기반 자료: ADA Caries Risk Assessment Form (Age >6, 2011) · AAP 치은염 진단 기준 · AASM 수면 이갈이 지표 · NIDCR 치아 과민증 임상 지표<br>제작: </div>';
 
   document.getElementById('reportWrap').innerHTML = html;
@@ -1081,25 +1081,24 @@ function showToast(msg) {
 }
 
 function copyLink() {
-  var url = window.location.href;
-  try {
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(url).then(function() {
-        showToast('✓ 링크가 복사되었어요!');
-      }).catch(function() {
-        fallbackCopy(url);
-      });
-    } else {
-      fallbackCopy(url);
-    }
-  } catch(e) {
-    fallbackCopy(url);
+  var shareText = '🦷 내 치아 나이 테스트 결과\n'
+    + '실제 나이 ' + realAge + '세 → 치아 나이 ' + dentalAge + '세\n'
+    + '유형: ' + type + '\n\n'
+    + '나도 해보기 👉 https://dentalst.github.io/Dentest/';
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(shareText).then(function() {
+      showToast('✓ 복사 완료! 카톡에 붙여넣기 하세요');
+    }).catch(function() {
+      fallbackCopy(shareText);
+    });
+  } else {
+    fallbackCopy(shareText);
   }
 }
 
-function fallbackCopy(url) {
+function fallbackCopy(text) {
   var ta = document.createElement('textarea');
-  ta.value = url;
+  ta.value = text;
   ta.style.position = 'fixed';
   ta.style.opacity = '0';
   document.body.appendChild(ta);
@@ -1107,7 +1106,7 @@ function fallbackCopy(url) {
   ta.select();
   try {
     document.execCommand('copy');
-    showToast('✓ 링크가 복사되었어요!');
+    showToast('✓ 복사 완료! 카톡에 붙여넣기 하세요');
   } catch(e) {
     showToast('주소창 URL을 직접 복사해주세요');
   }
