@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>치아 나이 자가진단 | 조선대 치과대학</title>
+<title>치아 나이 자가진단</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -983,13 +983,14 @@ function showResult() {
   });
 
   var typeMap = {
-    management: { name: "치과 장기 무단결석형", badge: "관리 공백", desc: "정기 방문과 위생 관리에 공백이 쌓이고 있어요. 지금부터 시작하면 충분히 회복 가능합니다." },
-    erosion:    { name: "법랑질 산 부식형",     badge: "산 부식",  desc: "단 음료와 건조한 구강 환경이 치아 표면을 서서히 녹이고 있을 수 있어요." },
-    bruxism:    { name: "수면 이갈이형",         badge: "이갈이",   desc: "자는 동안 이를 갈고 있을 가능성이 높아요. 치아 균열과 마모의 주요 원인입니다." },
-    symptom:    { name: "증상 누적형",           badge: "증상 누적", desc: "시림, 출혈, 통증 등 여러 신호가 동시에 나타나고 있어요. 지금 바로 확인이 필요합니다." },
+    management: { name: "치과 3년 장기결석 우수상", badge: "관리 공백", desc: "정기 방문과 위생 관리에 공백이 쌓이고 있어요. 지금부터 시작하면 충분히 회복 가능합니다." },
+    erosion:    { name: "아메리카노 법랑질 용해중", badge: "산 부식",  desc: "단 음료와 건조한 구강 환경이 치아 표면을 서서히 녹이고 있을 수 있어요." },
+    bruxism:    { name: "수면중 무의식 치아 분쇄기", badge: "이갈이",   desc: "자는 동안 이를 갈고 있을 가능성이 높아요. 치아 균열과 마모의 주요 원인입니다." },
+    symptom:    { name: "잇몸 경고등 점등중",        badge: "증상 누적", desc: "시림, 출혈, 통증 등 여러 신호가 동시에 나타나고 있어요. 지금 바로 확인이 필요합니다." },
+    good:       { name: "치아 모범생 (희귀종)",       badge: "양호",     desc: "구강 관리를 꾸준히 잘 하고 계세요. 이 상태 유지가 핵심입니다." },
   };
 
-  var dominantType = typeMap[dominant.key];
+  var dominantType = ratio < 0.2 ? typeMap['good'] : typeMap[dominant.key];
 
   var totalScore = answers.reduce(function(sum, ansIdx, qIdx) {
     return sum + (ansIdx !== null ? questions[qIdx].options[ansIdx].score : 0);
@@ -1065,7 +1066,7 @@ function showResult() {
     + '<div class="section-title fade-up">주요 발견 사항</div>'
     + '<div class="analysis-items fade-up">' + analysisHTML + '</div>'
     + '<div class="cta-box fade-up"><div class="cta-box-title">' + ctaTitle + '</div><div class="cta-box-desc">' + ctaDesc + '</div><a class="cta-btn" href="https://open.kakao.com/o/sllXWTvi" target="_blank">📩 ' + ctaBtn + '</a><div class="share-btns"><button class="share-btn" onclick="copyLink()">🔗 링크 복사</button><button class="share-btn" onclick="saveImage()">📷 이미지 저장</button></div><button class="retry-btn" onclick="retryTest()">↺ 다시 테스트하기</button></div>'
-    + '<div class="ref-note fade-up">본 검사는 자가진단 목적으로 제작되었으며 임상적 진단을 대체하지 않습니다.<br>기반 자료: ADA Caries Risk Assessment Form (Age >6, 2011) · AAP 치은염 진단 기준 · AASM 수면 이갈이 지표 · NIDCR 치아 과민증 임상 지표<br>제작: 조선대학교 치과대학 본과 3학년</div>';
+    + '<div class="ref-note fade-up">본 검사는 자가진단 목적으로 제작되었으며 임상적 진단을 대체하지 않습니다.<br>기반 자료: ADA Caries Risk Assessment Form (Age >6, 2011) · AAP 치은염 진단 기준 · AASM 수면 이갈이 지표 · NIDCR 치아 과민증 임상 지표<br>제작: </div>';
 
   document.getElementById('reportWrap').innerHTML = html;
 
