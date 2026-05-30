@@ -874,6 +874,8 @@ const questions = [
 let current = 0;
 let answers = new Array(questions.length).fill(null);
 let realAge = 25;
+var dentalAge = 0;
+var type = '';
 
 function checkAge() {
   const val = parseInt(document.getElementById('ageInput').value);
@@ -999,7 +1001,7 @@ function showResult() {
   var maxScore = questions.length * 4;
   var ratio = totalScore / maxScore;
 
-  var dentalAge, typeClass, dentalClass, typeBadge;
+  var typeClass, dentalClass, typeBadge;
 
   if (ratio < 0.2) {
     dentalAge = Math.max(10, realAge - Math.floor(Math.random() * 4 + 2));
@@ -1018,7 +1020,7 @@ function showResult() {
     { icon: "💡", title: "지금 할 수 있는 것", desc: dominant.key === 'erosion' ? "산성 음료 후 물로 입 헹구기, 불소 치약으로 교체하기" : dominant.key === 'bruxism' ? "자기 전 턱 긴장 풀기, 수면 이갈이 마우스가드 상담" : dominant.key === 'symptom' ? "통증 부위 기록 후 치과 방문, 방치 금지" : "6개월에 한 번 정기 검진 예약하기" },
   ];
 
-  var type = dominantType.name;
+  type = dominantType.name;
 
   const diff = dentalAge - realAge;
   const diffText = diff > 0
