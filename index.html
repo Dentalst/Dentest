@@ -1089,7 +1089,7 @@ function copyLink() {
     + '나도 해보기 👉 https://dentalst.github.io/Dentest/';
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(shareText).then(function() {
-      showToast('✓ 복사 완료! 카톡에 붙여넣기 하세요');
+      showToast('✓ 복사 완료!');
     }).catch(function() {
       fallbackCopy(shareText);
     });
@@ -1108,7 +1108,7 @@ function fallbackCopy(text) {
   ta.select();
   try {
     document.execCommand('copy');
-    showToast('✓ 복사 완료! 카톡에 붙여넣기 하세요');
+    showToast('✓ 복사 완료!');
   } catch(e) {
     showToast('주소창 URL을 직접 복사해주세요');
   }
